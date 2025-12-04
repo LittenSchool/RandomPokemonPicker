@@ -1,109 +1,170 @@
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
-import java.util.ArrayList;
+import java.awt.event.WindowEvent;
+import java.io.IOException;
 import java.util.Random;
 
 public class RandomNumberGUI {
-    private JFrame frame;
-    private JLabel numberLabel;
-    private JButton rollButton, saveButton, discardButton;
-    private JList[] lists;
-    private DefaultListModel<String>[] listModels;
-    private int currentNumber = -1;
-    private Random random = new Random();
+    private static JFrame frame;
+    private static JLabel numberLabel;
 
-    public RandomNumberGUI() {
+    private static JList[] lists;
+    private static DefaultListModel<String>[] listModels;
+    private static int[] currentNumbers; // Stores roll per player
+
+    private static Random random = new Random();
+
+    // Players
+    static String[] players = {"Jason", "Jiveen", "Jacob", "Isabelle", "Calum", "Karesz", "Viktors","8th more sinister option"};
+    static int numberOfPlayers = players.length;
+
+    // ===== GLOBAL DISCARD LIMIT =====
+    private static int remainingDiscards = 3;
+
+
+    public static void run() {
         frame = new JFrame("Random Pokemon Roller");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(900, 600);
+        frame.setSize(1100, 650);
         frame.setLayout(new BorderLayout());
+        // Top display label
+        numberLabel = new JLabel("Roll for a Player Below");
+        numberLabel.setFont(new Font("Impact", Font.BOLD, 32));
+        numberLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        frame.add(numberLabel, BorderLayout.NORTH);
 
-        // Top panel with roll + display
-        JPanel topPanel = new JPanel();
-        topPanel.setLayout(new FlowLayout());
-        numberLabel = new JLabel("Roll to Generate Player");
-        numberLabel.setFont(new Font("Impact", Font.BOLD, 36));
-        rollButton = new JButton("Roll Random Number");
+        // Arrays
+        lists = new JList[numberOfPlayers];
+        listModels = new DefaultListModel[numberOfPlayers];
+        currentNumbers = new int[numberOfPlayers];
 
-        topPanel.add(numberLabel);
-        topPanel.add(rollButton);
+        JPanel listPanel = new JPanel(new GridLayout(1, numberOfPlayers));
 
-        frame.add(topPanel, BorderLayout.NORTH);
+        for (int i = 0; i < numberOfPlayers; i++) {
+            currentNumbers[i] = -1;
 
-        // Center panel with 7 lists
-        JPanel listPanel = new JPanel();
-        listPanel.setLayout(new GridLayout(1, 7));
-
-        lists = new JList[7];
-        listModels = new DefaultListModel[7];
-
-        for (int i = 0; i < 7; i++) {
             listModels[i] = new DefaultListModel<>();
             lists[i] = new JList<>(listModels[i]);
-
-            // Set custom font here
-            applyListFont(lists[i], new Font("Impact", Font.PLAIN, 64));
+            applyListFont(lists[i], new Font("Impact", Font.PLAIN, 48));
 
             JScrollPane scroll = new JScrollPane(lists[i]);
+
             JPanel column = new JPanel(new BorderLayout());
-            String[] options = {"Jason", "Jiveen", "Jacob", "Isabelle", "Calum", "Karesz", "Viktors"};
-            column.add(new JLabel(options[i], SwingConstants.CENTER), BorderLayout.NORTH);
+
+            JLabel nameLabel = new JLabel(players[i], SwingConstants.CENTER);
+            nameLabel.setFont(new Font("Impact", Font.BOLD, 28));
+            column.add(nameLabel, BorderLayout.NORTH);
+
+            JButton rollBtn = new JButton("Roll");
+            int index = i;
+
+            rollBtn.addActionListener(e -> {
+                try {
+                    handleRoll(index);
+                } catch (IOException ex) {
+                    throw new RuntimeException(ex);
+                }
+            });
+
+            JPanel buttonRow = new JPanel();
+            buttonRow.setLayout(new GridLayout(1, 1));
+            buttonRow.add(rollBtn);
+
             column.add(scroll, BorderLayout.CENTER);
+            column.add(buttonRow, BorderLayout.SOUTH);
+
             listPanel.add(column);
         }
 
-
         frame.add(listPanel, BorderLayout.CENTER);
-
-        // Bottom buttons for save + discard
-        JPanel bottomPanel = new JPanel();
-        saveButton = new JButton("Save to Player...");
-        discardButton = new JButton("Discard");
-
-        bottomPanel.add(saveButton);
-        bottomPanel.add(discardButton);
-
-        frame.add(bottomPanel, BorderLayout.SOUTH);
-
-        addListeners();
-
         frame.setVisible(true);
-    }
-
-    private void addListeners() {
-        rollButton.addActionListener(e -> {
-            currentNumber = random.nextInt(1022) + 1;
-            numberLabel.setText("Rolled: " + TheCollection.pokemon.get(currentNumber).name);
-        });
-
-        discardButton.addActionListener(e -> {
-            currentNumber = -1;
-            numberLabel.setText("Roll to Generate Pokemon");
-        });
-
-        saveButton.addActionListener(e -> {
-            if (currentNumber == -1) return;
-
-            // Popup to choose list
-            String[] options = {"Jason", "Jiveen", "Jacob", "Isabelle", "Calum", "Karesz", "Viktors"};
-            int choice = JOptionPane.showOptionDialog(frame,
-                    "Choose a Player to save to:",
-                    "Save Pokemon",
-                    JOptionPane.DEFAULT_OPTION,
-                    JOptionPane.PLAIN_MESSAGE,
-                    null,
-                    options,
-                    options[0]);
-
-            if (choice >= 0 && choice < 7) {
-                listModels[choice].addElement(TheCollection.pokemon.get(currentNumber).name);
-                currentNumber = -1;
-                numberLabel.setText("Roll to Generate Pokemon");
+        for (int i = 0; i < FileHandler.getLineAmount(TheCollection.savedList); i++) {
+            String collectable = FileHandler.returnLine(TheCollection.savedList, i);
+            if (!collectable.isEmpty()) {
+                String[] stats = collectable.split(",");
+                listModels[Integer.parseInt(stats[0])].addElement(stats[1]);
             }
-        });
+        }
     }
-    private void applyListFont(JList<Integer> list, Font font) {
+
+    private static void handleRoll(int playerIndex) throws IOException {
+        int rolledNumber = random.nextInt(TheCollection.getSpecies().size()) + 1;
+        String pokemonName = TheCollection.getSpecies().get(rolledNumber);
+        boolean copy = false;
+        for (int i = 0; i < players.length; i++) {
+            if (players[i].equals(pokemonName)) {
+                copy = true;
+            }
+        }
+        while (copy) {
+            copy = false;
+            rolledNumber = random.nextInt(TheCollection.getSpecies().size()) + 1;
+            for (int i = 0; i < players.length; i++) {
+                if (players[i].equals(pokemonName)) {
+                    copy = true;
+                }
+            }
+        }
+
+        numberLabel.setText(players[playerIndex] + " rolled: The " + pokemonName + " line");
+
+        // Confirmation Window
+        Object[] options = {
+                "Save Pokémon",
+                "Discard (Remaining: " + remainingDiscards + ")",
+                "Cancel"
+        };
+
+        int choice = JOptionPane.showOptionDialog(
+                frame,
+                players[playerIndex] + " rolled:\n The " + pokemonName + " line" +
+                        "\n\nSave this Pokémon or discard it?",
+                "Confirm Roll",
+                JOptionPane.YES_NO_CANCEL_OPTION,
+                JOptionPane.PLAIN_MESSAGE,
+                null,
+                options,
+                options[0]
+        );
+
+        if (choice == 0) { // Save
+            listModels[playerIndex].addElement(pokemonName);
+        }
+        else if (choice == 1) { // Discard
+            if (remainingDiscards > 0) {
+                remainingDiscards--;
+
+                JOptionPane.showMessageDialog(
+                        frame,
+                        "Discarded. Remaining discards: " + remainingDiscards,
+                        "Discard Used",
+                        JOptionPane.INFORMATION_MESSAGE
+                );
+
+                if (remainingDiscards == 0) {
+                    JOptionPane.showMessageDialog(
+                            frame,
+                            "No discards remaining!",
+                            "Out of Discards",
+                            JOptionPane.WARNING_MESSAGE
+                    );
+                }
+
+            } else {
+                JOptionPane.showMessageDialog(
+                        frame,
+                        "No discards remaining!",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE
+                );
+                listModels[playerIndex].addElement(pokemonName);
+            }
+        }
+        // Cancel does nothing
+        TheCollection.saveList();
+    }
+
+    private static void applyListFont(JList<Integer> list, Font font) {
         list.setCellRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(
@@ -122,4 +183,13 @@ public class RandomNumberGUI {
         });
     }
 
+    static String getCSV() {
+        String csv = "";
+        for (int i = 0; i < numberOfPlayers; i++) {
+            for (int j = 0; j < listModels[i].size(); j++) {
+                csv += i + "," +listModels[i].get(j) + "\n";
+            }
+        }
+        return csv;
+    }
 }

@@ -7,8 +7,9 @@ public class Pokemon {
     int sAtk;
     int sDef;
     int speed;
+    String evoLine;
 
-    public Pokemon(String name, double natDexNumber, int hp, int atk, int def, int sAtk, int sDef, int speed) {
+    public Pokemon(String name, double natDexNumber, int hp, int atk, int def, int sAtk, int sDef, int speed,String evoLine) {
         this.name = name;
         this.natDexNumber = natDexNumber;
         this.hp = hp;
@@ -17,6 +18,7 @@ public class Pokemon {
         this.sAtk = sAtk;
         this.sDef = sDef;
         this.speed = speed;
+        this.evoLine = evoLine;
     }
 
     public Pokemon(double natDexNumber) {
@@ -51,7 +53,15 @@ public class Pokemon {
         this.speed = speed;
     }
 
+    public void setEvoLine(String evoLine) {
+        this.evoLine = evoLine;
+    }
+
+    public String getEvoLine() {
+        return evoLine;
+    }
+
     public String getCSV() {
-        return name + "," + natDexNumber  + "," + hp  + "," + atk + "," + def + "," + sAtk + "," + sDef + "," + speed;
+        return name + "," + natDexNumber  + "," + hp  + "," + atk + "," + def + "," + sAtk + "," + sDef + "," + speed + "," + evoLine;
     }
 }
