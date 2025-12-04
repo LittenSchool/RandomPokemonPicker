@@ -5,9 +5,9 @@ import java.util.Scanner;
 public class TheCollection {
     static String filename = "Pokemon.txt";
     static String savedList = "Save.txt";
-    static private ArrayList<Pokemon> pokemon = new ArrayList<>();
-    static private ArrayList<String> species = new ArrayList<>();
-    static private ArrayList<Pokemon> vetod = new ArrayList<>();
+    static ArrayList<Pokemon> pokemon = new ArrayList<>();
+    static ArrayList<String> species = new ArrayList<>();
+    static ArrayList<String> vetod = new ArrayList<>();
     static RandomNumberGUI gui;
 
     public static void run() {
@@ -45,7 +45,7 @@ public class TheCollection {
         return pokemon;
     }
 
-    public static ArrayList<Pokemon> getVetod() {
+    public static ArrayList<String> getVetod() {
         return vetod;
     }
 

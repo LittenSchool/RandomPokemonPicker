@@ -2,6 +2,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
+import java.util.Objects;
 import java.util.Random;
 
 public class RandomNumberGUI {
@@ -16,13 +17,17 @@ public class RandomNumberGUI {
 
     // Players
     static String[] players = {"Jason", "Jiveen", "Jacob", "Isabelle", "Calum", "Karesz", "Viktors","8th more sinister option"};
+    static int[] discardsPerPlayer = new int[players.length];
     static int numberOfPlayers = players.length;
 
     // ===== GLOBAL DISCARD LIMIT =====
-    private static int remainingDiscards = 3;
+    private static final int remainingDiscards = 3;
 
 
     public static void run() {
+        for (int i = 0; i < numberOfPlayers; i++) {
+            discardsPerPlayer[i] = remainingDiscards;
+        }
         frame = new JFrame("Random Pokemon Roller");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(1100, 650);
@@ -76,49 +81,70 @@ public class RandomNumberGUI {
             listPanel.add(column);
         }
 
+        // Load save file
         frame.add(listPanel, BorderLayout.CENTER);
         frame.setVisible(true);
         for (int i = 0; i < FileHandler.getLineAmount(TheCollection.savedList); i++) {
             String collectable = FileHandler.returnLine(TheCollection.savedList, i);
             if (!collectable.isEmpty()) {
                 String[] stats = collectable.split(",");
-                listModels[Integer.parseInt(stats[0])].addElement(stats[1]);
+                if (Objects.equals(stats[0], "-1")) {
+                    TheCollection.vetod.add(stats[1]);
+
+                } else if (Objects.equals(stats[0], "discards")){
+                    for (int j = 0; j < numberOfPlayers; j++) {
+                        discardsPerPlayer[j] = Integer.parseInt(stats[j + 1]);
+                    }
+
+                } else {
+                    listModels[Integer.parseInt(stats[0])].addElement(stats[1]);
+                }
+                TheCollection.species.remove(stats[1]);
+
             }
         }
+        System.out.println(TheCollection.species);
     }
 
     private static void handleRoll(int playerIndex) throws IOException {
         int rolledNumber = random.nextInt(TheCollection.getSpecies().size()) + 1;
         String pokemonName = TheCollection.getSpecies().get(rolledNumber);
-        boolean copy = false;
         for (int i = 0; i < players.length; i++) {
             if (players[i].equals(pokemonName)) {
-                copy = true;
             }
         }
-        while (copy) {
-            copy = false;
-            rolledNumber = random.nextInt(TheCollection.getSpecies().size()) + 1;
-            for (int i = 0; i < players.length; i++) {
-                if (players[i].equals(pokemonName)) {
-                    copy = true;
-                }
+
+        //Make the whole evo line
+        StringBuilder wholeEvoLine = new StringBuilder();
+        for (int i = 0; i < TheCollection.getPokemon().size(); i++) {
+            if (TheCollection.getPokemon().get(i).getEvoLine().equals(pokemonName)) {
+                assert false;
+                wholeEvoLine.append(TheCollection.getPokemon().get(i).getName());
+                wholeEvoLine.append("\n");
             }
         }
+
 
         numberLabel.setText(players[playerIndex] + " rolled: The " + pokemonName + " line");
 
         // Confirmation Window
         Object[] options = {
                 "Save Pokémon",
-                "Discard (Remaining: " + remainingDiscards + ")",
+                "Discard (Remaining: " + discardsPerPlayer[playerIndex] + ")",
                 "Cancel"
+        };
+
+        Object[] discardOptions = {
+                "Put back into pool",
+                "Fuck you I'm Vetoing this shit",
         };
 
         int choice = JOptionPane.showOptionDialog(
                 frame,
-                players[playerIndex] + " rolled:\n The " + pokemonName + " line" +
-                        "\n\nSave this Pokémon or discard it?",
+                players[playerIndex] + " rolled: The " + pokemonName + " line" +
+                        "\n\nThis line has the Pokémon:\n" +
+                        wholeEvoLine +
+                        "\nSave this Pokémon or discard it?",
                 "Confirm Roll",
                 JOptionPane.YES_NO_CANCEL_OPTION,
                 JOptionPane.PLAIN_MESSAGE,
@@ -127,21 +153,31 @@ public class RandomNumberGUI {
                 options[0]
         );
 
+
         if (choice == 0) { // Save
             listModels[playerIndex].addElement(pokemonName);
         }
         else if (choice == 1) { // Discard
-            if (remainingDiscards > 0) {
-                remainingDiscards--;
+            int discardChoice;
+            if (discardsPerPlayer[playerIndex] > 0) {
+                discardsPerPlayer[playerIndex]--;
 
-                JOptionPane.showMessageDialog(
+                discardChoice = JOptionPane.showOptionDialog(
                         frame,
-                        "Discarded. Remaining discards: " + remainingDiscards,
+                        "Discarded. Remaining discards: " + discardsPerPlayer[playerIndex],
                         "Discard Used",
-                        JOptionPane.INFORMATION_MESSAGE
+                        JOptionPane.YES_NO_CANCEL_OPTION,
+                        JOptionPane.PLAIN_MESSAGE,
+                        null,
+                        discardOptions,
+                        discardOptions[0]
                 );
 
-                if (remainingDiscards == 0) {
+                if (discardChoice == 1) { //Veto
+                    TheCollection.vetod.add(pokemonName);
+                }
+
+                if (discardsPerPlayer[playerIndex] == 0) {
                     JOptionPane.showMessageDialog(
                             frame,
                             "No discards remaining!",
@@ -190,6 +226,14 @@ public class RandomNumberGUI {
                 csv += i + "," +listModels[i].get(j) + "\n";
             }
         }
+        for (int i = 0; i < TheCollection.vetod.size(); i++) {
+            csv += "-1," +TheCollection.vetod.get(i) + "\n";
+        }
+        csv += "discards,";
+        for (int i = 0; i < discardsPerPlayer.length; i++) {
+            csv += discardsPerPlayer[i] + ",";
+        }
+        csv += "\n";
         return csv;
     }
 }

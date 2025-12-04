@@ -61,6 +61,10 @@ public class Pokemon {
         return evoLine;
     }
 
+    public String getName() {
+        return name;
+    }
+
     public String getCSV() {
         return name + "," + natDexNumber  + "," + hp  + "," + atk + "," + def + "," + sAtk + "," + sDef + "," + speed + "," + evoLine;
     }
