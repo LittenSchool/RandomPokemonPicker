@@ -156,6 +156,7 @@ public class RandomNumberGUI {
 
         if (choice == 0) { // Save
             listModels[playerIndex].addElement(pokemonName);
+            TheCollection.species.remove(pokemonName);
         }
         else if (choice == 1) { // Discard
             int discardChoice;
@@ -175,6 +176,7 @@ public class RandomNumberGUI {
 
                 if (discardChoice == 1) { //Veto
                     TheCollection.vetod.add(pokemonName);
+                    TheCollection.species.remove(pokemonName);
                 }
 
                 if (discardsPerPlayer[playerIndex] == 0) {
