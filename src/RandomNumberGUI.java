@@ -103,7 +103,9 @@ public class RandomNumberGUI {
 
             }
         }
-        System.out.println(TheCollection.species);
+        //System.out.println(TheCollection.species);
+        frame.repaint();
+        frame.revalidate();
     }
 
     private static void handleRoll(int playerIndex) throws IOException {
