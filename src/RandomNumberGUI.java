@@ -52,7 +52,7 @@ public class RandomNumberGUI {
 
             listModels[i] = new DefaultListModel<>();
             lists[i] = new JList<>(listModels[i]);
-            applyListFont(lists[i], new Font("Impact", Font.PLAIN, 48));
+            applyListFont(lists[i], new Font("Impact", Font.PLAIN, 30));
 
             int finalIndex = i;
             lists[i].addMouseListener(new MouseAdapter() {
