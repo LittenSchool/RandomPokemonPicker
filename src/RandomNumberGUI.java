@@ -90,16 +90,24 @@ public class RandomNumberGUI {
                 String[] stats = collectable.split(",");
                 if (Objects.equals(stats[0], "-1")) {
                     TheCollection.vetod.add(stats[1]);
+                    frame.repaint();
+                    frame.revalidate();
 
                 } else if (Objects.equals(stats[0], "discards")){
                     for (int j = 0; j < numberOfPlayers; j++) {
                         discardsPerPlayer[j] = Integer.parseInt(stats[j + 1]);
+                        frame.repaint();
+                        frame.revalidate();
                     }
 
                 } else {
                     listModels[Integer.parseInt(stats[0])].addElement(stats[1]);
+                    frame.repaint();
+                    frame.revalidate();
                 }
                 TheCollection.species.remove(stats[1]);
+                frame.repaint();
+                frame.revalidate();
 
             }
         }

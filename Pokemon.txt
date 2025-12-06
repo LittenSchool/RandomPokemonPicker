@@ -273,7 +273,7 @@ Smoochum,238.0,45,30,15,85,65,65,Jynx
 Elekid,239.0,45,63,37,65,55,95,Electabuzz
 Magby,240.0,45,75,37,70,55,83,Magmar
 Miltank,241.0,95,80,105,40,70,100,Miltank
-Blissey,242.0,255,10,10,75,135,55,Chancey
+Blissey,242.0,255,10,10,75,135,55,Chansey
 Larvitar,246.0,50,64,50,45,50,41,Larvitar
 Pupitar,247.0,70,84,70,65,70,51,Larvitar
 Tyranitar,248.0,100,134,110,95,100,61,Larvitar
@@ -451,7 +451,7 @@ Shellos(East),422.0,76,48,48,57,62,34,Shellos
 Shellos(West),422.1,76,48,48,57,62,34,Shellos
 Gastrodon(East),423.0,111,83,68,92,82,39,Shellos
 Gastrodon(West),423.1,111,83,68,92,82,39,Shellos
-Ambipom,424.0,75,100,66,60,66,115,Ambipom
+Ambipom,424.0,75,100,66,60,66,115,Aipom
 Drifloon,425.0,90,50,34,60,44,70,Drifloon
 Drifblim,426.0,150,80,44,90,54,80,Drifloon
 Buneary,427.0,55,66,44,44,56,85,Buneary
@@ -488,7 +488,7 @@ Lumineon,457.0,69,69,76,69,86,91,Finneon
 Mantyke,458.0,45,20,50,60,120,50,Mantyke
 Snover,459.0,60,62,50,62,60,40,Snover
 Abomasnow,460.0,90,92,75,92,85,60,Snover
-Weavile,461.0,70,120,65,45,85,125,Snover
+Weavile,461.0,70,120,65,45,85,125,Sneasel
 Magnezone,462.0,70,70,115,130,90,60,Magnemite
 Lickilicky,463.0,110,85,95,80,95,50,Lickitung
 Rhyperior,464.0,115,140,130,55,55,40,Rhyhorn
