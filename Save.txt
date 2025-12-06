@@ -21,6 +21,7 @@
 0,Goldeen
 0,Burmy
 0,Yamask
+0,Rellor
 1,Scraggy
 1,Carvanha
 1,Wimpod
@@ -32,7 +33,6 @@
 1,Grookey
 1,Lapras
 1,Squirtle
-1,Chancey
 1,Lillipup
 1,Panpour
 1,Yungoos
@@ -44,6 +44,7 @@
 1,Kecleon
 1,Rufflet
 1,Chewtle
+1,Onix
 2,Cyclizar
 2,Sandshrew
 2,Wingull
@@ -67,6 +68,7 @@
 2,Voltorb
 2,Bounsweet
 2,Bergmite
+2,Mantine
 3,Inkay
 3,Finizen
 3,Staryu
@@ -91,6 +93,8 @@
 3,Drowzee
 3,Silicobra
 3,Frillish
+3,Bellsprout
+3,Capsakid
 4,Maschiff
 4,Natu
 4,Beldum
@@ -114,6 +118,8 @@
 4,Orthworm
 4,Zigzagoon
 4,Mudkip
+4,Zubat
+4,Poltchageist
 5,Cetoddle
 5,Magmar
 5,Indeedee(Male)
@@ -137,6 +143,8 @@
 5,Comfey
 5,Sandile
 5,Mareep
+5,Solrock
+5,Carnivine
 6,Turtwig
 6,Omanyte
 6,Passimian
@@ -159,6 +167,9 @@
 6,Shroodle
 6,Helioptile
 6,Psyduck
+6,Buneary
+6,Klawf
+6,Sawk
 7,Aron
 7,Chatot
 7,Dracozolt
@@ -181,6 +192,7 @@
 7,Varoom
 7,Jynx
 7,Cyndaquil
+7,Joltik
 -1,Alomomola
 -1,Jigglypuff
 discards,2,1,3,2,2,3,3,3,

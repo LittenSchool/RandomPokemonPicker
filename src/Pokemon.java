@@ -65,6 +65,10 @@ public class Pokemon {
         return name;
     }
 
+    public int getBST() {
+        return atk+def+sAtk+sDef+hp+speed;
+    }
+
     public String getCSV() {
         return name + "," + natDexNumber  + "," + hp  + "," + atk + "," + def + "," + sAtk + "," + sDef + "," + speed + "," + evoLine;
     }

@@ -1,8 +1,9 @@
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.WindowEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.IOException;
-import java.util.Objects;
+import java.util.ArrayList;
 import java.util.Random;
 
 public class RandomNumberGUI {
@@ -12,7 +13,7 @@ public class RandomNumberGUI {
     private static JList[] lists;
     private static DefaultListModel<String>[] listModels;
     private static int[] currentNumbers; // Stores roll per player
-
+    private static ArrayList<String> removedSpeciesBuffer = new ArrayList<>();
     private static Random random = new Random();
 
     // Players
@@ -25,20 +26,21 @@ public class RandomNumberGUI {
 
 
     public static void run() {
+
         for (int i = 0; i < numberOfPlayers; i++) {
             discardsPerPlayer[i] = remainingDiscards;
         }
+
         frame = new JFrame("Random Pokemon Roller");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(1100, 650);
         frame.setLayout(new BorderLayout());
-        // Top display label
+
         numberLabel = new JLabel("Roll for a Player Below");
         numberLabel.setFont(new Font("Impact", Font.BOLD, 32));
         numberLabel.setHorizontalAlignment(SwingConstants.CENTER);
         frame.add(numberLabel, BorderLayout.NORTH);
 
-        // Arrays
         lists = new JList[numberOfPlayers];
         listModels = new DefaultListModel[numberOfPlayers];
         currentNumbers = new int[numberOfPlayers];
@@ -52,6 +54,16 @@ public class RandomNumberGUI {
             lists[i] = new JList<>(listModels[i]);
             applyListFont(lists[i], new Font("Impact", Font.PLAIN, 48));
 
+            int finalIndex = i;
+            lists[i].addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    int idx = lists[finalIndex].locationToIndex(e.getPoint());
+                    if (idx != -1)
+                        onListElementClicked(finalIndex, listModels[finalIndex].getElementAt(idx));
+                }
+            });
+
             JScrollPane scroll = new JScrollPane(lists[i]);
 
             JPanel column = new JPanel(new BorderLayout());
@@ -61,18 +73,16 @@ public class RandomNumberGUI {
             column.add(nameLabel, BorderLayout.NORTH);
 
             JButton rollBtn = new JButton("Roll");
-            int index = i;
-
+            int idx = i;
             rollBtn.addActionListener(e -> {
                 try {
-                    handleRoll(index);
+                    handleRoll(idx);
                 } catch (IOException ex) {
-                    throw new RuntimeException(ex);
+                    ex.printStackTrace();
                 }
             });
 
-            JPanel buttonRow = new JPanel();
-            buttonRow.setLayout(new GridLayout(1, 1));
+            JPanel buttonRow = new JPanel(new GridLayout(1, 1));
             buttonRow.add(rollBtn);
 
             column.add(scroll, BorderLayout.CENTER);
@@ -81,40 +91,49 @@ public class RandomNumberGUI {
             listPanel.add(column);
         }
 
-        // Load save file
         frame.add(listPanel, BorderLayout.CENTER);
-        frame.setVisible(true);
+
+        // ------------------------------
+        // LOAD SAVE FILE *BEFORE SHOWING FRAME*
+        // ------------------------------
+        ArrayList<String> speciesToRemove = new ArrayList<>();
+
         for (int i = 0; i < FileHandler.getLineAmount(TheCollection.savedList); i++) {
+
             String collectable = FileHandler.returnLine(TheCollection.savedList, i);
             if (!collectable.isEmpty()) {
+
                 String[] stats = collectable.split(",");
-                if (Objects.equals(stats[0], "-1")) {
+
+                if (stats[0].equals("-1")) {
                     TheCollection.vetod.add(stats[1]);
-                    frame.repaint();
-                    frame.revalidate();
-
-                } else if (Objects.equals(stats[0], "discards")){
-                    for (int j = 0; j < numberOfPlayers; j++) {
+                } else if (stats[0].equals("discards")) {
+                    for (int j = 0; j < numberOfPlayers; j++)
                         discardsPerPlayer[j] = Integer.parseInt(stats[j + 1]);
-                        frame.repaint();
-                        frame.revalidate();
-                    }
-
                 } else {
-                    listModels[Integer.parseInt(stats[0])].addElement(stats[1]);
-                    frame.repaint();
-                    frame.revalidate();
+                    int p = Integer.parseInt(stats[0]);
+                    listModels[p].addElement(stats[1]);  // <-- OK now (not visible yet)
                 }
-                TheCollection.species.remove(stats[1]);
-                frame.repaint();
-                frame.revalidate();
 
+                speciesToRemove.add(stats[1]);
             }
         }
-        //System.out.println(TheCollection.species);
-        frame.repaint();
-        frame.revalidate();
+
+        // ensure species cleanup happens after model fill
+        SwingUtilities.invokeLater(() -> {
+            for (String s : speciesToRemove) {
+                TheCollection.species.remove(s);
+            }
+        });
+
+        // ------------------------------
+        // NOW show the frame safely
+        // ------------------------------
+        frame.setVisible(true);
+
+        System.out.println(TheCollection.species);
     }
+
 
     private static void handleRoll(int playerIndex) throws IOException {
         int rolledNumber = random.nextInt(TheCollection.getSpecies().size()) + 1;
@@ -125,14 +144,7 @@ public class RandomNumberGUI {
         }
 
         //Make the whole evo line
-        StringBuilder wholeEvoLine = new StringBuilder();
-        for (int i = 0; i < TheCollection.getPokemon().size(); i++) {
-            if (TheCollection.getPokemon().get(i).getEvoLine().equals(pokemonName)) {
-                assert false;
-                wholeEvoLine.append(TheCollection.getPokemon().get(i).getName());
-                wholeEvoLine.append("\n");
-            }
-        }
+        String wholeEvoLine = getEvoLineFromSpecies(pokemonName);
 
 
         numberLabel.setText(players[playerIndex] + " rolled: The " + pokemonName + " line");
@@ -212,8 +224,10 @@ public class RandomNumberGUI {
         TheCollection.saveList();
     }
 
-    private static void applyListFont(JList<Integer> list, Font font) {
+    private static void applyListFont(JList<String> list, Font font) {
+
         list.setCellRenderer(new DefaultListCellRenderer() {
+
             @Override
             public Component getListCellRendererComponent(
                     JList<?> list,
@@ -226,10 +240,22 @@ public class RandomNumberGUI {
                         list, value, index, isSelected, cellHasFocus);
 
                 label.setFont(font);
+
+                if (value != null) {
+                    String name = value.toString();
+                    ImageIcon icon = loadPokemonIcon(name);
+
+                    if (icon != null)
+                        label.setIcon(icon);
+                    else
+                        label.setIcon(null);
+                }
+
                 return label;
             }
         });
     }
+
 
     static String getCSV() {
         String csv = "";
@@ -248,4 +274,69 @@ public class RandomNumberGUI {
         csv += "\n";
         return csv;
     }
+
+    private static void onListElementClicked(int playerIndex, String value) {
+        String message = getEvoLineFromSpecies(value);
+        JOptionPane.showMessageDialog(frame,
+                value + " evo line includes: \n" + message,
+                "Item Clicked",
+                JOptionPane.INFORMATION_MESSAGE
+        );
+    }
+
+    private static String getEvoLineFromSpecies(String pokemonName) {
+        StringBuilder wholeEvoLine = new StringBuilder();
+        for (int i = 0; i < TheCollection.getPokemon().size(); i++) {
+            if (TheCollection.getPokemon().get(i).getEvoLine().equals(pokemonName)) {
+                assert false;
+                wholeEvoLine.append(TheCollection.getPokemon().get(i).getName());
+                wholeEvoLine.append(" - BST ");
+                wholeEvoLine.append(TheCollection.getPokemon().get(i).getBST());
+                wholeEvoLine.append("\n");
+            }
+        }
+        return wholeEvoLine.toString();
+    }
+
+    // ---- IMAGE SUPPORT ----
+    private static String imageFolderPath = ""; // YOU set this externally
+    private static final java.util.Map<String, ImageIcon> iconCache = new java.util.HashMap<>();
+
+    public static void setImageFolderPath(String path) {
+        imageFolderPath = path;
+    }
+
+    private static ImageIcon loadPokemonIcon(String pokemonName) {
+        if (iconCache.containsKey(pokemonName)) {
+            System.out.println("bad");
+            return iconCache.get(pokemonName);
+        }
+        if (imageFolderPath == null || imageFolderPath.isEmpty()) {
+            System.out.println("dddddsad");
+            return null;
+        }
+
+        try {
+            String filePath = imageFolderPath + pokemonName + ".png";
+            ImageIcon icon = new ImageIcon(filePath);
+
+            if (icon.getIconWidth() <= 0) {
+                iconCache.put(pokemonName, null);
+                System.out.println("dddad");
+                return null;
+            }
+
+            // Resize to fit list
+            Image scaled = icon.getImage().getScaledInstance(60, 60, Image.SCALE_SMOOTH);
+            ImageIcon result = new ImageIcon(scaled);
+            iconCache.put(pokemonName, result);
+            return result;
+
+        } catch (Exception e) {
+            iconCache.put(pokemonName, null);
+            return null;
+        }
+    }
+
+
 }
