@@ -17,15 +17,22 @@ public class RandomNumberGUI {
     private static Random random = new Random();
 
     // Players
-    static String[] players = {"Jason", "Jiveen", "Jacob", "Isabelle", "Calum", "Karesz", "Viktors","8th more sinister option"};
-    static int[] discardsPerPlayer = new int[players.length];
-    static int numberOfPlayers = players.length;
+    static String[] players;
+    static int[] discardsPerPlayer;
+    static int numberOfPlayers;
 
     // ===== GLOBAL DISCARD LIMIT =====
     private static final int remainingDiscards = 3;
 
 
     public static void run() {
+        // make the list of players
+        players = new String[TheCollection.players.size()];
+        for (int i = 0; i < TheCollection.players.size(); i++) {
+            players[i] = TheCollection.players.get(i);
+        }
+        numberOfPlayers = players.length;
+        discardsPerPlayer = new int[players.length];
 
         for (int i = 0; i < numberOfPlayers; i++) {
             discardsPerPlayer[i] = remainingDiscards;
@@ -35,6 +42,19 @@ public class RandomNumberGUI {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(1100, 650);
         frame.setLayout(new BorderLayout());
+        frame.setLocationRelativeTo(null);
+
+        frame.addWindowListener(new java.awt.event.WindowAdapter() {
+            @Override
+            public void windowClosing(java.awt.event.WindowEvent windowEvent) {
+                try {
+                    TheCollection.saveList();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
+
 
         numberLabel = new JLabel("Roll for a Player Below");
         numberLabel.setFont(new Font("Impact", Font.BOLD, 32));
@@ -98,24 +118,29 @@ public class RandomNumberGUI {
         // ------------------------------
         ArrayList<String> speciesToRemove = new ArrayList<>();
 
-        for (int i = 0; i < FileHandler.getLineAmount(TheCollection.savedList); i++) {
+        if(!StartupPeoplePicker.newSave) {
 
-            String collectable = FileHandler.returnLine(TheCollection.savedList, i);
-            if (!collectable.isEmpty()) {
+            for (int i = 0; i < FileHandler.getLineAmount(TheCollection.savedList); i++) {
 
-                String[] stats = collectable.split(",");
+                String collectable = FileHandler.returnLine(TheCollection.savedList, i);
+                if (!collectable.isEmpty()) {
 
-                if (stats[0].equals("-1")) {
-                    TheCollection.vetod.add(stats[1]);
-                } else if (stats[0].equals("discards")) {
-                    for (int j = 0; j < numberOfPlayers; j++)
-                        discardsPerPlayer[j] = Integer.parseInt(stats[j + 1]);
-                } else {
-                    int p = Integer.parseInt(stats[0]);
-                    listModels[p].addElement(stats[1]);  // <-- OK now (not visible yet)
+                    String[] stats = collectable.split(",");
+
+                    if (stats[0].equals("-1")) {
+                        TheCollection.vetod.add(stats[1]);
+                    } else if (stats[0].equals("discards")) {
+                        for (int j = 0; j < numberOfPlayers; j++)
+                            discardsPerPlayer[j] = Integer.parseInt(stats[j + 1]);
+                    } else if (stats[0].equals("players")) {
+
+                    } else {
+                        int p = Integer.parseInt(stats[0]);
+                        listModels[p].addElement(stats[1]);  // <-- OK now (not visible yet)
+                    }
+
+                    speciesToRemove.add(stats[1]);
                 }
-
-                speciesToRemove.add(stats[1]);
             }
         }
 
@@ -136,7 +161,7 @@ public class RandomNumberGUI {
 
 
     private static void handleRoll(int playerIndex) throws IOException {
-        int rolledNumber = random.nextInt(TheCollection.getSpecies().size()) + 1;
+        int rolledNumber = random.nextInt(TheCollection.getSpecies().size());
         String pokemonName = TheCollection.getSpecies().get(rolledNumber);
         for (int i = 0; i < players.length; i++) {
             if (players[i].equals(pokemonName)) {
@@ -158,7 +183,7 @@ public class RandomNumberGUI {
 
         Object[] discardOptions = {
                 "Put back into pool",
-                "Fuck you I'm Vetoing this shit",
+                "I'm Vetoing this",
         };
 
         int choice = JOptionPane.showOptionDialog(
@@ -272,6 +297,11 @@ public class RandomNumberGUI {
             csv += discardsPerPlayer[i] + ",";
         }
         csv += "\n";
+        csv += "players,";
+        for (int i = 0; i < numberOfPlayers; i++) {
+            csv += players[i] + ",";
+        }
+        csv += "\n";
         return csv;
     }
 
@@ -308,11 +338,9 @@ public class RandomNumberGUI {
 
     private static ImageIcon loadPokemonIcon(String pokemonName) {
         if (iconCache.containsKey(pokemonName)) {
-            System.out.println("bad");
             return iconCache.get(pokemonName);
         }
         if (imageFolderPath == null || imageFolderPath.isEmpty()) {
-            System.out.println("dddddsad");
             return null;
         }
 
@@ -322,7 +350,6 @@ public class RandomNumberGUI {
 
             if (icon.getIconWidth() <= 0) {
                 iconCache.put(pokemonName, null);
-                System.out.println("dddad");
                 return null;
             }
 

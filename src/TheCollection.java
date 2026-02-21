@@ -1,3 +1,4 @@
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Scanner;
@@ -8,6 +9,7 @@ public class TheCollection {
     static ArrayList<Pokemon> pokemon = new ArrayList<>();
     static ArrayList<String> species = new ArrayList<>();
     static ArrayList<String> vetod = new ArrayList<>();
+    static ArrayList<String> players = new ArrayList<>();
     static RandomNumberGUI gui;
 
     public static void run() {
@@ -23,7 +25,16 @@ public class TheCollection {
                 species.add(pokemon.get(i).getEvoLine());
             }
         }
-        RandomNumberGUI.run();
+        File f = new File(savedList);
+        if(!(f.exists() && !f.isDirectory())) {
+            StartupPeoplePicker.run();
+        } else {
+            String[] thePlayers = FileHandler.returnLine(TheCollection.savedList, FileHandler.getLineAmount(TheCollection.savedList) - 2).split(",");
+            for (int i = 1; i < thePlayers.length; i++) {
+                players.add(thePlayers[i]);
+            }
+            RandomNumberGUI.run();
+        }
     }
 
     public static void save() throws IOException {
@@ -51,5 +62,9 @@ public class TheCollection {
 
     public static ArrayList<String> getSpecies() {
         return species;
+    }
+
+    public static void addPlayer(String player) {
+        players.add(player);
     }
 }
