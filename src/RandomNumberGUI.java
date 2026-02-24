@@ -9,6 +9,7 @@ import java.util.Random;
 public class RandomNumberGUI {
     private static JFrame frame;
     private static JLabel numberLabel;
+    private static boolean isTradeMode;
 
     private static JList[] lists;
     private static DefaultListModel<String>[] listModels;
@@ -79,8 +80,12 @@ public class RandomNumberGUI {
                 @Override
                 public void mouseClicked(MouseEvent e) {
                     int idx = lists[finalIndex].locationToIndex(e.getPoint());
-                    if (idx != -1)
+                    if (idx != -1 && e.getButton() == MouseEvent.BUTTON1) {
                         onListElementClicked(finalIndex, listModels[finalIndex].getElementAt(idx));
+                    }
+                    else if (idx != -1 && e.getButton() == MouseEvent.BUTTON3) {
+                        TradeMenu.run(finalIndex, listModels[finalIndex].getElementAt(idx));
+                    }
                 }
             });
 
@@ -365,5 +370,22 @@ public class RandomNumberGUI {
         }
     }
 
+    public static void trade(String pokemonNameA, String pokemonNameB, int playerA, int playerB) {
+        listModels[playerA].removeElement(pokemonNameA);
+        listModels[playerB].removeElement(pokemonNameB);
+        listModels[playerA].addElement(pokemonNameB);
+        listModels[playerB].addElement(pokemonNameA);
+    }
 
+    public static boolean getIsTradeMode() {
+        return isTradeMode;
+    }
+
+    public static void setIsTradeMode(boolean isTradeMode) {
+        RandomNumberGUI.isTradeMode = isTradeMode;
+    }
+
+    public static String getPlayer(int id) {
+        return players[id];
+    }
 }
