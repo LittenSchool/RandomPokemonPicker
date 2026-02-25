@@ -1,11 +1,13 @@
 import javax.swing.*;
 import java.awt.*;
 import java.io.IOException;
+import java.util.Random;
 
 public class StartupPeoplePicker {
     private static JFrame frame;
     private static JLabel title;
     public static boolean newSave = false;
+    static Random rand = new Random();
 
     public static void run() {
         newSave = true;
@@ -26,7 +28,10 @@ public class StartupPeoplePicker {
 
         JButton confirm = new JButton("Confirm");
         confirm.addActionListener(e -> {
+            Color color = new Color(rand.nextInt(0xFFFFFF));
             TheCollection.addPlayer(enterBox.getText());
+            System.out.println(color);
+            TheCollection.addColour(TheCollection.colourToHex(color));
             enterBox.setText("");
         });
         frame.add(confirm, BorderLayout.SOUTH);

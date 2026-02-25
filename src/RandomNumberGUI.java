@@ -2,9 +2,10 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Random;
+import java.util.*;
 
 public class RandomNumberGUI {
     private static JFrame frame;
@@ -45,9 +46,9 @@ public class RandomNumberGUI {
         frame.setLayout(new BorderLayout());
         frame.setLocationRelativeTo(null);
 
-        frame.addWindowListener(new java.awt.event.WindowAdapter() {
+        frame.addWindowListener(new WindowAdapter() {
             @Override
-            public void windowClosing(java.awt.event.WindowEvent windowEvent) {
+            public void windowClosing(WindowEvent windowEvent) {
                 try {
                     TheCollection.saveList();
                 } catch (IOException e) {
@@ -95,6 +96,8 @@ public class RandomNumberGUI {
 
             JLabel nameLabel = new JLabel(players[i], SwingConstants.CENTER);
             nameLabel.setFont(new Font("Impact", Font.BOLD, 28));
+            Color tempColour = new Color(hexToInt(Objects.requireNonNull(TheCollection.getPlayerColours().get(i))));
+            nameLabel.setForeground(tempColour);
             column.add(nameLabel, BorderLayout.NORTH);
 
             JButton rollBtn = new JButton("Roll");
@@ -139,7 +142,15 @@ public class RandomNumberGUI {
                             discardsPerPlayer[j] = Integer.parseInt(stats[j + 1]);
                     } else if (stats[0].equals("players")) {
 
-                    } else {
+                    } else if (stats[0].equals("colours")) {
+
+                    }
+                    else {
+                        // adding the pokemon to a list
+                        Pokemon temp = new Pokemon(stats[1]);
+                        temp.setColour(stats[2]);
+                        TheCollection.pokemonInPlay.add(temp);
+
                         int p = Integer.parseInt(stats[0]);
                         listModels[p].addElement(stats[1]);  // <-- OK now (not visible yet)
                     }
@@ -207,6 +218,9 @@ public class RandomNumberGUI {
 
 
         if (choice == 0) { // Save
+            Pokemon temp = new Pokemon(pokemonName);
+            temp.setColour(TheCollection.getPlayerColours().get(playerIndex));
+            TheCollection.pokemonInPlay.add(temp);
             listModels[playerIndex].addElement(pokemonName);
             TheCollection.species.remove(pokemonName);
         }
@@ -273,12 +287,21 @@ public class RandomNumberGUI {
 
                 if (value != null) {
                     String name = value.toString();
-                    ImageIcon icon = loadPokemonIcon(name);
 
-                    if (icon != null)
-                        label.setIcon(icon);
-                    else
-                        label.setIcon(null);
+
+                    // --- ICON ---
+                    ImageIcon icon = loadPokemonIcon(name);
+                    label.setIcon(icon);
+
+                    // --- TEXT COLOR LOGIC ---
+                        if (TheCollection.getPokemonInPlayString().contains(name)) {
+                            Color tempColour = new Color(hexToInt(Objects.requireNonNull(TheCollection.getPokemonColour(name))));
+                            label.setForeground(tempColour);
+                        }
+
+
+
+
                 }
 
                 return label;
@@ -291,7 +314,7 @@ public class RandomNumberGUI {
         String csv = "";
         for (int i = 0; i < numberOfPlayers; i++) {
             for (int j = 0; j < listModels[i].size(); j++) {
-                csv += i + "," +listModels[i].get(j) + "\n";
+                csv += i + "," +listModels[i].get(j) + "," + TheCollection.getPokemonColour(listModels[i].get(j)) + "\n";
             }
         }
         for (int i = 0; i < TheCollection.vetod.size(); i++) {
@@ -307,6 +330,12 @@ public class RandomNumberGUI {
             csv += players[i] + ",";
         }
         csv += "\n";
+        csv += "colours,";
+        for (int i = 0; i < numberOfPlayers; i++) {
+            csv += TheCollection.getPlayerColours().get(i) + ",";
+        }
+        csv += "\n";
+
         return csv;
     }
 
@@ -335,7 +364,7 @@ public class RandomNumberGUI {
 
     // ---- IMAGE SUPPORT ----
     private static String imageFolderPath = ""; // YOU set this externally
-    private static final java.util.Map<String, ImageIcon> iconCache = new java.util.HashMap<>();
+    private static final Map<String, ImageIcon> iconCache = new HashMap<>();
 
     public static void setImageFolderPath(String path) {
         imageFolderPath = path;
@@ -377,6 +406,15 @@ public class RandomNumberGUI {
         listModels[playerB].addElement(pokemonNameA);
     }
 
+    public static Pokemon nameToPokemon(String pokemonName) {
+        for (int i = 0; i < TheCollection.getPokemon().size(); i++) {
+            if (TheCollection.getPokemon().get(i).getName().equals(pokemonName)) {
+                return TheCollection.getPokemon().get(i);
+            }
+        }
+        return null;
+    }
+
     public static boolean getIsTradeMode() {
         return isTradeMode;
     }
@@ -387,5 +425,20 @@ public class RandomNumberGUI {
 
     public static String getPlayer(int id) {
         return players[id];
+    }
+
+    public static int hexToInt(String hex) {
+        int tempInt;
+        int tempAscii = 0;
+        for (int i = 0; i < hex.length(); i++) {
+            tempInt = hex.charAt(i);
+            if (tempInt >= 48 && tempInt <= 57) {
+                tempAscii += (int) ((tempInt-48)*Math.pow(16, i));
+            } else if (tempInt >= 65 && tempInt <= 70) {
+                tempAscii += (int) ((tempInt-55)*Math.pow(16, i));
+            }
+
+        }
+        return tempAscii;
     }
 }

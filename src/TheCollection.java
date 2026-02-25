@@ -1,6 +1,8 @@
+import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Random;
 import java.util.Scanner;
 
 public class TheCollection {
@@ -9,8 +11,11 @@ public class TheCollection {
     static ArrayList<Pokemon> pokemon = new ArrayList<>();
     static ArrayList<String> species = new ArrayList<>();
     static ArrayList<String> vetod = new ArrayList<>();
+    static ArrayList<Pokemon> pokemonInPlay = new ArrayList<>(); //pokemon in play have colours
     static ArrayList<String> players = new ArrayList<>();
+    static ArrayList<String> playerColours = new ArrayList<>();
     static RandomNumberGUI gui;
+    static Random rand = new Random();
 
     public static void run() {
         String collectable;
@@ -29,9 +34,13 @@ public class TheCollection {
         if(!(f.exists() && !f.isDirectory())) {
             StartupPeoplePicker.run();
         } else {
-            String[] thePlayers = FileHandler.returnLine(TheCollection.savedList, FileHandler.getLineAmount(TheCollection.savedList) - 2).split(",");
+            String[] thePlayers = FileHandler.returnLine(TheCollection.savedList, FileHandler.getLineAmount(TheCollection.savedList) - 3).split(",");
             for (int i = 1; i < thePlayers.length; i++) {
                 players.add(thePlayers[i]);
+            }
+            String[] theColours = FileHandler.returnLine(TheCollection.savedList, FileHandler.getLineAmount(TheCollection.savedList) - 2).split(",");
+            for (int i = 1; i < theColours.length; i++) {
+                playerColours.add(theColours[i]);
             }
             RandomNumberGUI.run();
         }
@@ -66,5 +75,70 @@ public class TheCollection {
 
     public static void addPlayer(String player) {
         players.add(player);
+    }
+
+    public static void addColour(String colour) {
+        playerColours.add(colour);
+    }
+
+    public static ArrayList<String> getPokemonInPlayString() {
+        ArrayList<String> pokemonInPlayNames = new ArrayList<>();
+        for (Pokemon value : pokemonInPlay) {
+            pokemonInPlayNames.add(value.getName());
+        }
+        return pokemonInPlayNames;
+    }
+
+    public static ArrayList<Pokemon> getPokemonInPlay() {
+        return pokemonInPlay;
+    }
+
+    public static String getPokemonColour(String name) {
+        for (int i = 0; i < pokemonInPlay.size(); i++) {
+            if (pokemonInPlay.get(i).getName().equals(name)) {
+                return pokemonInPlay.get(i).getColour();
+            }
+        }
+        System.out.println("returned null");
+        return null;
+    }
+
+    public static ArrayList<String> getPlayerColours() {
+        return playerColours;
+    }
+
+    public static String colourToHex(Color colour) {
+        String hex = "";
+        if (Math.floorDiv((colour.getRed()),16)>=10) {
+            hex += (char) ((Math.floorDiv((colour.getRed()), 16))+55);
+        } else {
+            hex += Math.floorDiv((colour.getRed()), 16);
+        }
+        if (((colour.getRed()) % 16)>=10) {
+            hex += (char) (((colour.getRed()) % 16)+55);
+        } else {
+            hex += (colour.getRed()) % 16;
+        }
+        if (Math.floorDiv((colour.getGreen()),16)>=10) {
+            hex += (char) ((Math.floorDiv((colour.getGreen()), 16))+55);
+        } else {
+            hex += Math.floorDiv((colour.getGreen()), 16);
+        }
+        if (((colour.getGreen()) % 16)>=10) {
+            hex = hex + (char) (((colour.getGreen()) % 16)+55);
+        } else {
+            hex += (colour.getGreen()) % 16;
+        }
+        if (Math.floorDiv((colour.getBlue()),16)>=10) {
+            hex += (char) ((Math.floorDiv((colour.getBlue()), 16))+55);
+        } else {
+            hex += Math.floorDiv((colour.getBlue()), 16);
+        }
+        if (((colour.getBlue()) % 16)>=10) {
+            hex = hex + (char) (((colour.getBlue()) % 16)+55);
+        } else {
+            hex += (colour.getBlue()) % 16;
+        }
+        return hex;
     }
 }
