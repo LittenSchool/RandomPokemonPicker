@@ -95,8 +95,8 @@ public class RandomNumberGUI {
             JPanel column = new JPanel(new BorderLayout());
 
             JLabel nameLabel = new JLabel(players[i], SwingConstants.CENTER);
-            nameLabel.setFont(new Font("Impact", Font.BOLD, 28));
-            Color tempColour = new Color(hexToInt(Objects.requireNonNull(TheCollection.getPlayerColours().get(i))));
+            nameLabel.setFont(new Font("Impact", Font.BOLD, 32));
+            Color tempColour = Color.decode("#" + Objects.requireNonNull(TheCollection.getPlayerColours().get(i)));
             nameLabel.setForeground(tempColour);
             column.add(nameLabel, BorderLayout.NORTH);
 
@@ -300,7 +300,7 @@ public class RandomNumberGUI {
 
                     // --- TEXT COLOR LOGIC ---
                         if (TheCollection.getPokemonInPlayString().contains(name)) {
-                            Color tempColour = new Color(hexToInt(Objects.requireNonNull(TheCollection.getPokemonColour(name))));
+                            Color tempColour = Color.decode("#" + Objects.requireNonNull(TheCollection.getPokemonColour(name)));
                             label.setForeground(tempColour);
                         }
 
@@ -432,18 +432,4 @@ public class RandomNumberGUI {
         return players[id];
     }
 
-    public static int hexToInt(String hex) {
-        int tempInt;
-        int tempAscii = 0;
-        for (int i = 0; i < hex.length(); i++) {
-            tempInt = hex.charAt(i);
-            if (tempInt >= 48 && tempInt <= 57) {
-                tempAscii += (int) ((tempInt-48)*Math.pow(16, i));
-            } else if (tempInt >= 65 && tempInt <= 70) {
-                tempAscii += (int) ((tempInt-55)*Math.pow(16, i));
-            }
-
-        }
-        return tempAscii;
-    }
 }
