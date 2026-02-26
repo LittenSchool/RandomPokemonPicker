@@ -177,6 +177,11 @@ public class RandomNumberGUI {
 
 
     private static void handleRoll(int playerIndex) throws IOException {
+        if ((TheCollection.getSpecies().isEmpty())) {
+            System.out.println("End of list");
+            System.out.println(TheCollection.species);
+            return;
+        }
         int rolledNumber = random.nextInt(TheCollection.getSpecies().size());
         String pokemonName = TheCollection.getSpecies().get(rolledNumber);
         for (int i = 0; i < players.length; i++) {
