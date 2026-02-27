@@ -7,7 +7,10 @@ import java.util.Scanner;
 public class Main {
     public static void main(String[] args) throws IOException {
         RandomNumberGUI.setImageFolderPath("Pokemon Icons/");
+
         TheCollection.run();
+        System.out.println(TheCollection.getSpecies().size());
+        System.out.println(TheCollection.getSpecies());
 
     }
 }
