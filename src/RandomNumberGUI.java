@@ -59,7 +59,7 @@ public class RandomNumberGUI {
 
 
         numberLabel = new JLabel("Roll for a Player Below");
-        numberLabel.setFont(new Font("Impact", Font.BOLD, 32));
+        numberLabel.setFont(new Font("Impact", Font.BOLD, TheCollection.FONT_SIZE));
         numberLabel.setHorizontalAlignment(SwingConstants.CENTER);
         frame.add(numberLabel, BorderLayout.NORTH);
 
@@ -74,7 +74,7 @@ public class RandomNumberGUI {
 
             listModels[i] = new DefaultListModel<>();
             lists[i] = new JList<>(listModels[i]);
-            applyListFont(lists[i], new Font("Impact", Font.PLAIN, 30));
+            applyListFont(lists[i], new Font("Impact", Font.PLAIN, TheCollection.FONT_SIZE));
 
             int finalIndex = i;
             lists[i].addMouseListener(new MouseAdapter() {
@@ -95,7 +95,7 @@ public class RandomNumberGUI {
             JPanel column = new JPanel(new BorderLayout());
 
             JLabel nameLabel = new JLabel(players[i], SwingConstants.CENTER);
-            nameLabel.setFont(new Font("Impact", Font.BOLD, 32));
+            nameLabel.setFont(new Font("Impact", Font.BOLD, TheCollection.FONT_SIZE));
             Color tempColour = Color.decode("#" + Objects.requireNonNull(TheCollection.getPlayerColours().get(i)));
             nameLabel.setForeground(tempColour);
             column.add(nameLabel, BorderLayout.NORTH);
@@ -303,6 +303,16 @@ public class RandomNumberGUI {
                             Color tempColour = Color.decode("#" + Objects.requireNonNull(TheCollection.getPokemonColour(name)));
                             label.setForeground(tempColour);
                         }
+                    // Alternating colour
+                        if (index%2 == 1) {
+                            label.setBackground(Color.decode("#dfdfdf"));
+                        } else {
+                            label.setBackground(Color.WHITE);
+                        }
+
+                        if (index%10 == 9) {
+                            label.setBackground(Color.decode("#ffdddd"));
+                        }
 
 
 
@@ -345,9 +355,11 @@ public class RandomNumberGUI {
     }
 
     private static void onListElementClicked(int playerIndex, String value) {
-        String message = getEvoLineFromSpecies(value);
+        JTextArea label = new JTextArea(value + " evo line includes: \n" + getEvoLineFromSpecies(value));
+        label.setEditable(false);
+        label.setFont(new Font("Arial", Font.BOLD, TheCollection.FONT_SIZE/2));
         JOptionPane.showMessageDialog(frame,
-                value + " evo line includes: \n" + message,
+                label,
                 "Item Clicked",
                 JOptionPane.INFORMATION_MESSAGE
         );

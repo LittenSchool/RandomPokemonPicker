@@ -14,6 +14,7 @@ public class TheCollection {
     static ArrayList<Pokemon> pokemonInPlay = new ArrayList<>(); //pokemon in play have colours
     static ArrayList<String> players = new ArrayList<>();
     static ArrayList<String> playerColours = new ArrayList<>();
+    static final int FONT_SIZE = 50;
     static RandomNumberGUI gui;
     static Random rand = new Random();
 
