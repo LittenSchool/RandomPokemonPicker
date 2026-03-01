@@ -1,7 +1,5 @@
 import javax.swing.*;
 import java.awt.*;
-import java.io.IOException;
-import java.util.Objects;
 
 public class TradeMenu {
     private static JFrame frame;
@@ -29,12 +27,14 @@ public class TradeMenu {
                 bufferedTradePokemon = tradePokemon;
                 bufferedTradePlayerID = playerID;
                 RandomNumberGUI.setIsTradeMode(!RandomNumberGUI.getIsTradeMode());
+                RandomNumberGUI.toggleIsTradeMenuOpen();
                 frame.dispose();
             });
             frame.add(confirm, BorderLayout.EAST);
 
             JButton deny = new JButton("No");
             deny.addActionListener(e -> {
+                RandomNumberGUI.toggleIsTradeMenuOpen();
                 frame.dispose();
             });
             frame.add(deny, BorderLayout.WEST);
@@ -55,6 +55,7 @@ public class TradeMenu {
                 confirm.addActionListener(e -> {
                     RandomNumberGUI.trade(bufferedTradePokemon,tradePokemon,bufferedTradePlayerID,playerID);
                     RandomNumberGUI.setIsTradeMode(!RandomNumberGUI.getIsTradeMode());
+                    RandomNumberGUI.toggleIsTradeMenuOpen();
                     frame.dispose();
                 });
                 frame.add(confirm, BorderLayout.EAST);
@@ -62,6 +63,7 @@ public class TradeMenu {
                 JButton deny = new JButton("No");
                 deny.addActionListener(e -> {
                     RandomNumberGUI.setIsTradeMode(!RandomNumberGUI.getIsTradeMode());
+                    RandomNumberGUI.toggleIsTradeMenuOpen();
                     frame.dispose();
                 });
                 frame.add(deny, BorderLayout.WEST);

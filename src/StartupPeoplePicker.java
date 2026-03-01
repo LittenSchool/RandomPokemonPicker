@@ -55,6 +55,7 @@ public class StartupPeoplePicker {
         proceed.addActionListener(e -> {
             RandomNumberGUI.run();
             frame.dispose();
+            frame2.dispose();
         });
         frame.add(proceed, BorderLayout.EAST);
         frame.setVisible(true);

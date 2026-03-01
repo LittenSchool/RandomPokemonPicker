@@ -11,6 +11,7 @@ public class RandomNumberGUI {
     private static JFrame frame;
     private static JLabel numberLabel;
     private static boolean isTradeMode;
+    private static boolean isTradeMenuOpen = false;
 
     private static JList[] lists;
     private static DefaultListModel<String>[] listModels;
@@ -84,7 +85,8 @@ public class RandomNumberGUI {
                     if (idx != -1 && e.getButton() == MouseEvent.BUTTON1) {
                         onListElementClicked(finalIndex, listModels[finalIndex].getElementAt(idx));
                     }
-                    else if (idx != -1 && e.getButton() == MouseEvent.BUTTON3) {
+                    else if (idx != -1 && e.getButton() == MouseEvent.BUTTON3 && !isTradeMenuOpen) {
+                        isTradeMenuOpen = true;
                         TradeMenu.run(finalIndex, listModels[finalIndex].getElementAt(idx));
                     }
                 }
@@ -442,6 +444,11 @@ public class RandomNumberGUI {
 
     public static String getPlayer(int id) {
         return players[id];
+    }
+
+    public static void toggleIsTradeMenuOpen() {
+        isTradeMenuOpen = !isTradeMenuOpen;
+        System.out.println(isTradeMenuOpen);
     }
 
 }
