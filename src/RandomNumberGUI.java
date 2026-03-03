@@ -174,14 +174,14 @@ public class RandomNumberGUI {
         // ------------------------------
         frame.setVisible(true);
 
-        System.out.println(TheCollection.species);
+        //System.out.println(TheCollection.species);
     }
 
 
     private static void handleRoll(int playerIndex) throws IOException {
         if ((TheCollection.getSpecies().isEmpty())) {
             System.out.println("End of list");
-            System.out.println(TheCollection.species);
+            //System.out.println(TheCollection.species);
             return;
         }
         int rolledNumber = random.nextInt(TheCollection.getSpecies().size());
@@ -407,7 +407,7 @@ public class RandomNumberGUI {
             }
 
             // Resize to fit list
-            Image scaled = icon.getImage().getScaledInstance(60, 60, Image.SCALE_SMOOTH);
+            Image scaled = icon.getImage().getScaledInstance(TheCollection.scaleInt(60), TheCollection.scaleInt(60), Image.SCALE_SMOOTH);
             ImageIcon result = new ImageIcon(scaled);
             iconCache.put(pokemonName, result);
             return result;
@@ -446,9 +446,17 @@ public class RandomNumberGUI {
         return players[id];
     }
 
+    public static int getWindowWidth() {
+        if (frame == null) {
+            return -1;
+        } else {
+            return frame.getWidth();
+        }
+    }
+
     public static void toggleIsTradeMenuOpen() {
         isTradeMenuOpen = !isTradeMenuOpen;
-        System.out.println(isTradeMenuOpen);
+        //System.out.println(isTradeMenuOpen);
     }
 
     //test 2

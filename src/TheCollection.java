@@ -13,9 +13,10 @@ public class TheCollection {
     static ArrayList<Pokemon> pokemonInPlay = new ArrayList<>(); //pokemon in play have colours
     static ArrayList<String> players = new ArrayList<>();
     static ArrayList<String> playerColours = new ArrayList<>();
-    static final int fontSize = 50;
+    static final int fontSize = 45;
     static RandomNumberGUI gui;
     static Random rand = new Random();
+    static final double SCALE_FACTOR = (Toolkit.getDefaultToolkit().getScreenSize().getWidth()/2560);
 
     public static void run() {
         String collectable;
@@ -59,8 +60,15 @@ public class TheCollection {
         FileHandler.writeLine(savedList,RandomNumberGUI.getCSV());
     }
 
+    public static int scaleInt(int input) {
+        return (int) Math.round((input * (SCALE_FACTOR)));
+    }
+
     public static int getFontSize() {
-        return fontSize;
+
+            //System.out.println(scaleInt(fontSize));
+            return (scaleInt(fontSize));
+        //return fontSize;
     }
 
     static public ArrayList<Pokemon> getPokemon() {

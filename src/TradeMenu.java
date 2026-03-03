@@ -44,7 +44,7 @@ public class TradeMenu {
         } else {
             if (bufferedTradePlayerID == playerID) {
                 frame.dispose();
-                System.out.println("wheey");
+                //System.out.println("wheey");
             } else {
                 title = new JLabel("Does " + RandomNumberGUI.getPlayer(bufferedTradePlayerID) + " wish to trade " + bufferedTradePokemon + " for " + RandomNumberGUI.getPlayer(playerID) + "'s " + tradePokemon + "?");
                 title.setFont(new Font("Arial", Font.PLAIN, 20));
