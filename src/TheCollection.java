@@ -3,7 +3,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Random;
-import java.util.Scanner;
 
 public class TheCollection {
     static String filename = "Pokemon.txt";
@@ -14,7 +13,7 @@ public class TheCollection {
     static ArrayList<Pokemon> pokemonInPlay = new ArrayList<>(); //pokemon in play have colours
     static ArrayList<String> players = new ArrayList<>();
     static ArrayList<String> playerColours = new ArrayList<>();
-    static final int FONT_SIZE = 50;
+    static final int fontSize = 50;
     static RandomNumberGUI gui;
     static Random rand = new Random();
 
@@ -60,7 +59,9 @@ public class TheCollection {
         FileHandler.writeLine(savedList,RandomNumberGUI.getCSV());
     }
 
-
+    public static int getFontSize() {
+        return fontSize;
+    }
 
     static public ArrayList<Pokemon> getPokemon() {
         return pokemon;

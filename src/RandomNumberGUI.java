@@ -60,7 +60,7 @@ public class RandomNumberGUI {
 
 
         numberLabel = new JLabel("Roll for a Player Below");
-        numberLabel.setFont(new Font("Impact", Font.BOLD, TheCollection.FONT_SIZE));
+        numberLabel.setFont(new Font("Impact", Font.BOLD, TheCollection.getFontSize()));
         numberLabel.setHorizontalAlignment(SwingConstants.CENTER);
         frame.add(numberLabel, BorderLayout.NORTH);
 
@@ -75,7 +75,7 @@ public class RandomNumberGUI {
 
             listModels[i] = new DefaultListModel<>();
             lists[i] = new JList<>(listModels[i]);
-            applyListFont(lists[i], new Font("Impact", Font.PLAIN, TheCollection.FONT_SIZE));
+            applyListFont(lists[i], new Font("Impact", Font.PLAIN, TheCollection.getFontSize()));
 
             int finalIndex = i;
             lists[i].addMouseListener(new MouseAdapter() {
@@ -97,7 +97,7 @@ public class RandomNumberGUI {
             JPanel column = new JPanel(new BorderLayout());
 
             JLabel nameLabel = new JLabel(players[i], SwingConstants.CENTER);
-            nameLabel.setFont(new Font("Impact", Font.BOLD, TheCollection.FONT_SIZE));
+            nameLabel.setFont(new Font("Impact", Font.BOLD, TheCollection.getFontSize()));
             Color tempColour = Color.decode("#" + Objects.requireNonNull(TheCollection.getPlayerColours().get(i)));
             nameLabel.setForeground(tempColour);
             column.add(nameLabel, BorderLayout.NORTH);
@@ -359,7 +359,7 @@ public class RandomNumberGUI {
     private static void onListElementClicked(int playerIndex, String value) {
         JTextArea label = new JTextArea(value + " evo line includes: \n" + getEvoLineFromSpecies(value));
         label.setEditable(false);
-        label.setFont(new Font("Arial", Font.BOLD, TheCollection.FONT_SIZE/2));
+        label.setFont(new Font("Arial", Font.BOLD, TheCollection.getFontSize() /2));
         JOptionPane.showMessageDialog(frame,
                 label,
                 "Item Clicked",
