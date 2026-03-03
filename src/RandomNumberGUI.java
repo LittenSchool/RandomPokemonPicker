@@ -451,6 +451,6 @@ public class RandomNumberGUI {
         System.out.println(isTradeMenuOpen);
     }
 
-    //test
+    //test 2
 
 }
