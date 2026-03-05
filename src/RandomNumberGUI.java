@@ -67,8 +67,14 @@ public class RandomNumberGUI {
         lists = new JList[numberOfPlayers];
         listModels = new DefaultListModel[numberOfPlayers];
         currentNumbers = new int[numberOfPlayers];
+        int gridLayout = numberOfPlayers;
 
-        JPanel listPanel = new JPanel(new GridLayout(1, numberOfPlayers));
+        if (numberOfPlayers > 7) {
+            
+            gridLayout = Math.ceilDiv(numberOfPlayers,2);
+        }
+
+        JPanel listPanel = new JPanel(new GridLayout(0, gridLayout));
 
         for (int i = 0; i < numberOfPlayers; i++) {
             currentNumbers[i] = -1;
@@ -407,7 +413,7 @@ public class RandomNumberGUI {
             }
 
             // Resize to fit list
-            Image scaled = icon.getImage().getScaledInstance(TheCollection.scaleInt(60), TheCollection.scaleInt(60), Image.SCALE_SMOOTH);
+            Image scaled = icon.getImage().getScaledInstance(TheCollection.scaleImage(TheCollection.getFontSize()), TheCollection.scaleImage(TheCollection.getFontSize()), Image.SCALE_SMOOTH);
             ImageIcon result = new ImageIcon(scaled);
             iconCache.put(pokemonName, result);
             return result;
