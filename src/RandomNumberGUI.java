@@ -60,7 +60,7 @@ public class RandomNumberGUI {
 
 
         numberLabel = new JLabel("Roll for a Player Below");
-        numberLabel.setFont(new Font("Impact", Font.BOLD, TheCollection.getFontSize()));
+        numberLabel.setFont(new Font("Impact", Font.BOLD, 32));
         numberLabel.setHorizontalAlignment(SwingConstants.CENTER);
         frame.add(numberLabel, BorderLayout.NORTH);
 
@@ -103,7 +103,7 @@ public class RandomNumberGUI {
             JPanel column = new JPanel(new BorderLayout());
 
             JLabel nameLabel = new JLabel(players[i], SwingConstants.CENTER);
-            nameLabel.setFont(new Font("Impact", Font.BOLD, TheCollection.getFontSize()));
+            nameLabel.setFont(new Font("Impact", Font.BOLD, Math.clamp(TheCollection.getFontSize(),0,60)));
             Color tempColour = Color.decode("#" + Objects.requireNonNull(TheCollection.getPlayerColours().get(i)));
             nameLabel.setForeground(tempColour);
             column.add(nameLabel, BorderLayout.NORTH);
@@ -413,7 +413,7 @@ public class RandomNumberGUI {
             }
 
             // Resize to fit list
-            Image scaled = icon.getImage().getScaledInstance(TheCollection.scaleImage(TheCollection.getFontSize()), TheCollection.scaleImage(TheCollection.getFontSize()), Image.SCALE_SMOOTH);
+            Image scaled = icon.getImage().getScaledInstance(TheCollection.scaleFont(TheCollection.getFontSize()), TheCollection.scaleFont(TheCollection.getFontSize()), Image.SCALE_SMOOTH);
             ImageIcon result = new ImageIcon(scaled);
             iconCache.put(pokemonName, result);
             return result;

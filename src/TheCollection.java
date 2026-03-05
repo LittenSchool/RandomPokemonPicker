@@ -13,7 +13,7 @@ public class TheCollection {
     static ArrayList<Pokemon> pokemonInPlay = new ArrayList<>(); //pokemon in play have colours
     static ArrayList<String> players = new ArrayList<>();
     static ArrayList<String> playerColours = new ArrayList<>();
-    static final int fontSize = 400;
+    static final int fontSize = 45;
     static RandomNumberGUI gui;
     static Random rand = new Random();
     static final double SCALE_FACTOR = (Toolkit.getDefaultToolkit().getScreenSize().getWidth()/2560);
@@ -62,11 +62,7 @@ public class TheCollection {
 
     public static int scaleFont(int input) {
 
-        return (int) Math.round((input * (SCALE_FACTOR))*((double) 1 /RandomNumberGUI.numberOfPlayers));
-    }
-
-    public static int scaleImage(int input) {
-        return (int) Math.round((input * (SCALE_FACTOR))*((double) 1 /RandomNumberGUI.numberOfPlayers)*8);
+        return (int) Math.round((input * (SCALE_FACTOR)));
     }
 
     public static int getFontSize() {
