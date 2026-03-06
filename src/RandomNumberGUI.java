@@ -1,4 +1,5 @@
 import javax.swing.*;
+import javax.swing.Timer;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -12,6 +13,7 @@ public class RandomNumberGUI {
     private static JLabel numberLabel;
     private static boolean isTradeMode;
     private static boolean isTradeMenuOpen = false;
+    private static JLabel spriteLabel;
 
     private static JList[] lists;
     private static DefaultListModel<String>[] listModels;
@@ -63,6 +65,10 @@ public class RandomNumberGUI {
         numberLabel.setFont(new Font("Impact", Font.BOLD, 32));
         numberLabel.setHorizontalAlignment(SwingConstants.CENTER);
         frame.add(numberLabel, BorderLayout.NORTH);
+
+        spriteLabel = new JLabel();
+        spriteLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        frame.add(spriteLabel, BorderLayout.SOUTH);
 
         lists = new JList[numberOfPlayers];
         listModels = new DefaultListModel[numberOfPlayers];
@@ -185,101 +191,63 @@ public class RandomNumberGUI {
 
 
     private static void handleRoll(int playerIndex) throws IOException {
-        if ((TheCollection.getSpecies().isEmpty())) {
-            System.out.println("End of list");
-            //System.out.println(TheCollection.species);
-            return;
-        }
-        int rolledNumber = random.nextInt(TheCollection.getSpecies().size());
-        String pokemonName = TheCollection.getSpecies().get(rolledNumber);
-        for (int i = 0; i < players.length; i++) {
-            if (players[i].equals(pokemonName)) {
-            }
-        }
 
-        //Make the whole evo line
+        // Show the rolling animation window and get the final Pokémon
+        String pokemonName = showRollingWindow(playerIndex);
+
+        // Display result on main GUI
+        numberLabel.setText(players[playerIndex] + " rolled: " + pokemonName);
+
+        // Show confirmation
+        finishRoll(playerIndex, pokemonName);
+    }
+
+    private static void finishRoll(int playerIndex, String pokemonName) throws IOException {
+
         String wholeEvoLine = getEvoLineFromSpecies(pokemonName);
-
 
         numberLabel.setText(players[playerIndex] + " rolled: The " + pokemonName + " line");
 
-        // Confirmation Window
         Object[] options = {
                 "Save Pokémon",
-                "Discard (Remaining: " + discardsPerPlayer[playerIndex] + ")"
+                "Discard (Remaining: " + discardsPerPlayer[playerIndex] + ")",
+                "Cancel"
         };
 
         Object[] discardOptions = {
                 "Put back into pool",
-                "I'm Vetoing this",
+                "Fuck you I'm Vetoing this shit",
         };
 
-        String iconPath = imageFolderPath + pokemonName + ".png";
-        ImageIcon icon = new ImageIcon(iconPath);
-
-// scale icon nicely
-        Image img = icon.getImage().getScaledInstance(TheCollection.getFontSize()*3, TheCollection.getFontSize()*3, Image.SCALE_SMOOTH);
-        icon = new ImageIcon(img);
-
-// Main panel
-        JPanel panel = new JPanel();
-        panel.setLayout(new BorderLayout(10,10));
-
-// Icon at top
-        JLabel iconLabel = new JLabel(icon);
-        iconLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        panel.add(iconLabel, BorderLayout.NORTH);
-
-// Text section
-        JPanel textPanel = new JPanel();
-        textPanel.setLayout(new BoxLayout(textPanel, BoxLayout.Y_AXIS));
-
-        JLabel rolledLabel = new JLabel(players[playerIndex] + " rolled:");
-        rolledLabel.setFont(new Font("Impact", Font.PLAIN, (int) Math.round(TheCollection.getFontSize()/2.0)));
-        rolledLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-        JLabel lineLabel = new JLabel("The " + pokemonName + " line");
-        lineLabel.setFont(new Font("Impact", Font.PLAIN,(int) Math.round(TheCollection.getFontSize()/1.8)));
-        lineLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-        JTextArea evoArea = new JTextArea(wholeEvoLine);
-        evoArea.setFont(new Font("Impact", Font.PLAIN, (int) Math.round(TheCollection.getFontSize()/2.2)));
-        evoArea.setEditable(false);
-        evoArea.setOpaque(false);
-        evoArea.setLineWrap(true);
-        evoArea.setWrapStyleWord(true);
-        evoArea.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-        textPanel.add(rolledLabel);
-        textPanel.add(Box.createVerticalStrut(10));
-        textPanel.add(lineLabel);
-        textPanel.add(Box.createVerticalStrut(10));
-        textPanel.add(evoArea);
-
-        panel.add(textPanel, BorderLayout.CENTER);
+        ImageIcon icon = loadPokemonIcon(pokemonName, TheCollection.getFontSize()*3);
 
         int choice = JOptionPane.showOptionDialog(
                 frame,
-                panel,
+                players[playerIndex] + " rolled: The " + pokemonName + " line" +
+                        "\n\nThis line has the Pokémon:\n" +
+                        wholeEvoLine +
+                        "\nSave this Pokémon or discard it?",
                 "Confirm Roll",
-                JOptionPane.YES_NO_OPTION,
+                JOptionPane.YES_NO_CANCEL_OPTION,
                 JOptionPane.PLAIN_MESSAGE,
-                null,
+                icon,
                 options,
                 options[0]
         );
 
-
-        if (choice == 0) { // Save
+        if (choice == 0) {
             Pokemon temp = new Pokemon(pokemonName);
             temp.setColour(TheCollection.getPlayerColours().get(playerIndex));
             TheCollection.pokemonInPlay.add(temp);
             listModels[playerIndex].addElement(pokemonName);
             TheCollection.species.remove(pokemonName);
         }
-        else if (choice == 1) { // Discard
+        else if (choice == 1) {
+
             int discardChoice;
+
             if (discardsPerPlayer[playerIndex] > 0) {
+
                 discardsPerPlayer[playerIndex]--;
 
                 discardChoice = JOptionPane.showOptionDialog(
@@ -293,32 +261,98 @@ public class RandomNumberGUI {
                         discardOptions[0]
                 );
 
-                if (discardChoice == 1) { //Veto
+                if (discardChoice == 1) {
                     TheCollection.vetod.add(pokemonName);
                     TheCollection.species.remove(pokemonName);
                 }
 
-                if (discardsPerPlayer[playerIndex] == 0) {
-                    JOptionPane.showMessageDialog(
-                            frame,
-                            "No discards remaining!",
-                            "Out of Discards",
-                            JOptionPane.WARNING_MESSAGE
-                    );
-                }
-
             } else {
+
                 JOptionPane.showMessageDialog(
                         frame,
                         "No discards remaining!",
                         "Error",
                         JOptionPane.ERROR_MESSAGE
                 );
+
                 listModels[playerIndex].addElement(pokemonName);
             }
         }
-        // Cancel does nothing
+
         TheCollection.saveList();
+    }
+
+    private static int speedConverter(int speed) {
+        return Math.round((float) 1 /((float) speed /4000));
+    }
+
+    private static String showRollingWindow(int playerIndex) {
+
+        final int[] numberOfTicks = {-1};
+        Random rand = new Random();
+
+        int timerDeceleration = 3;
+
+        JDialog rollDialog = new JDialog(frame, players[playerIndex] + " Rolling...", true);
+        rollDialog.setSize(TheCollection.getFontSize()*6, TheCollection.getFontSize()*6);
+        rollDialog.setLocationRelativeTo(frame);
+        rollDialog.setLayout(new BorderLayout());
+
+        JLabel spriteLabel = new JLabel("", SwingConstants.CENTER);
+        JLabel nameLabel = new JLabel("", SwingConstants.CENTER);
+
+        nameLabel.setFont(new Font("Impact", Font.PLAIN, TheCollection.getFontSize()));
+
+        rollDialog.add(spriteLabel, BorderLayout.CENTER);
+        rollDialog.add(nameLabel, BorderLayout.SOUTH);
+
+        final String[] result = new String[1];
+        final int[] ticks = {0};
+        final int[] timerVelocity = {rand.nextInt(100,400)};
+        final boolean[] hasEnded = {false};
+
+
+        Timer timer = new Timer(speedConverter(timerVelocity[0]), null);
+
+        timer.addActionListener(e -> {
+
+            String randomPokemon = TheCollection.getSpecies().get(random.nextInt(TheCollection.getSpecies().size()));
+
+            nameLabel.setText(randomPokemon);
+
+            ImageIcon icon = loadPokemonIcon(randomPokemon, TheCollection.getFontSize()*3);
+            spriteLabel.setIcon(icon);
+            timer.setDelay(speedConverter(timerVelocity[0]));
+            timerVelocity[0] -= timerDeceleration;
+            if (timerVelocity[0] <= 0) {
+                timerVelocity[0] = 1;
+            }
+            System.out.println(timerVelocity[0]);
+
+
+            ticks[0]++;
+
+            if (hasEnded[0]) { // Makes the last rolled pokemon pop up last
+                System.out.println("balls");
+                timer.stop();
+                rollDialog.dispose();
+
+            } else if (timerVelocity[0] <= 1) { // how long the rolling lasts
+
+                result[0] = randomPokemon;
+                numberOfTicks[0] = ticks[0];
+                if (random.nextInt(10) == 0) {
+                    hasEnded[0] = false;
+                } else {hasEnded[0] = true;}
+
+
+            }
+        });
+
+        timer.start();
+        rollDialog.setVisible(true);
+
+        return result[0];
     }
 
     private static void applyListFont(JList<String> list, Font font) {
@@ -436,32 +470,59 @@ public class RandomNumberGUI {
     }
 
     private static ImageIcon loadPokemonIcon(String pokemonName) {
-        if (iconCache.containsKey(pokemonName)) {
-            return iconCache.get(pokemonName);
+
+        String cacheKey = pokemonName + "_" + TheCollection.getFontSize();
+
+        if (iconCache.containsKey(cacheKey)) {
+            return iconCache.get(cacheKey);
         }
-        if (imageFolderPath == null || imageFolderPath.isEmpty()) {
+
+        if (imageFolderPath == null || imageFolderPath.isEmpty())
+            return null;
+
+        String filePath = imageFolderPath + pokemonName + ".png";
+
+        ImageIcon icon = new ImageIcon(filePath);
+
+        if (icon.getIconWidth() <= 0) {
+            iconCache.put(cacheKey, null);
             return null;
         }
 
-        try {
-            String filePath = imageFolderPath + pokemonName + ".png";
-            ImageIcon icon = new ImageIcon(filePath);
+        Image scaled = icon.getImage().getScaledInstance(TheCollection.getFontSize(), TheCollection.getFontSize(), Image.SCALE_SMOOTH);
+        ImageIcon result = new ImageIcon(scaled);
 
-            if (icon.getIconWidth() <= 0) {
-                iconCache.put(pokemonName, null);
-                return null;
-            }
+        iconCache.put(cacheKey, result);
+        return result;
+    }
 
-            // Resize to fit list
-            Image scaled = icon.getImage().getScaledInstance(TheCollection.scaleFont(TheCollection.getFontSize()), TheCollection.scaleFont(TheCollection.getFontSize()), Image.SCALE_SMOOTH);
-            ImageIcon result = new ImageIcon(scaled);
-            iconCache.put(pokemonName, result);
-            return result;
 
-        } catch (Exception e) {
-            iconCache.put(pokemonName, null);
+
+    private static ImageIcon loadPokemonIcon(String pokemonName, int size) {
+
+        String cacheKey = pokemonName + "_" + size;
+
+        if (iconCache.containsKey(cacheKey)) {
+            return iconCache.get(cacheKey);
+        }
+
+        if (imageFolderPath == null || imageFolderPath.isEmpty())
+            return null;
+
+        String filePath = imageFolderPath + pokemonName + ".png";
+
+        ImageIcon icon = new ImageIcon(filePath);
+
+        if (icon.getIconWidth() <= 0) {
+            iconCache.put(cacheKey, null);
             return null;
         }
+
+        Image scaled = icon.getImage().getScaledInstance(size, size, Image.SCALE_SMOOTH);
+        ImageIcon result = new ImageIcon(scaled);
+
+        iconCache.put(cacheKey, result);
+        return result;
     }
 
     public static void trade(String pokemonNameA, String pokemonNameB, int playerA, int playerB) {
