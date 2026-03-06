@@ -16,7 +16,7 @@ public class TheCollection {
     static final int fontSize = 45;
     static RandomNumberGUI gui;
     static Random rand = new Random();
-    static final double SCALE_FACTOR = (Toolkit.getDefaultToolkit().getScreenSize().getWidth()/2560);
+    static final double SCALE_FACTOR = ((Toolkit.getDefaultToolkit().getScreenSize().getWidth()/2560)/1.075);
 
     public static void run() {
         String collectable;

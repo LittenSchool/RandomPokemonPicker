@@ -206,8 +206,7 @@ public class RandomNumberGUI {
         // Confirmation Window
         Object[] options = {
                 "Save Pokémon",
-                "Discard (Remaining: " + discardsPerPlayer[playerIndex] + ")",
-                "Cancel"
+                "Discard (Remaining: " + discardsPerPlayer[playerIndex] + ")"
         };
 
         Object[] discardOptions = {
@@ -215,14 +214,55 @@ public class RandomNumberGUI {
                 "I'm Vetoing this",
         };
 
+        String iconPath = imageFolderPath + pokemonName + ".png";
+        ImageIcon icon = new ImageIcon(iconPath);
+
+// scale icon nicely
+        Image img = icon.getImage().getScaledInstance(TheCollection.getFontSize()*3, TheCollection.getFontSize()*3, Image.SCALE_SMOOTH);
+        icon = new ImageIcon(img);
+
+// Main panel
+        JPanel panel = new JPanel();
+        panel.setLayout(new BorderLayout(10,10));
+
+// Icon at top
+        JLabel iconLabel = new JLabel(icon);
+        iconLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        panel.add(iconLabel, BorderLayout.NORTH);
+
+// Text section
+        JPanel textPanel = new JPanel();
+        textPanel.setLayout(new BoxLayout(textPanel, BoxLayout.Y_AXIS));
+
+        JLabel rolledLabel = new JLabel(players[playerIndex] + " rolled:");
+        rolledLabel.setFont(new Font("Impact", Font.PLAIN, (int) Math.round(TheCollection.getFontSize()/2.0)));
+        rolledLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        JLabel lineLabel = new JLabel("The " + pokemonName + " line");
+        lineLabel.setFont(new Font("Impact", Font.PLAIN,(int) Math.round(TheCollection.getFontSize()/1.8)));
+        lineLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        JTextArea evoArea = new JTextArea(wholeEvoLine);
+        evoArea.setFont(new Font("Impact", Font.PLAIN, (int) Math.round(TheCollection.getFontSize()/2.2)));
+        evoArea.setEditable(false);
+        evoArea.setOpaque(false);
+        evoArea.setLineWrap(true);
+        evoArea.setWrapStyleWord(true);
+        evoArea.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        textPanel.add(rolledLabel);
+        textPanel.add(Box.createVerticalStrut(10));
+        textPanel.add(lineLabel);
+        textPanel.add(Box.createVerticalStrut(10));
+        textPanel.add(evoArea);
+
+        panel.add(textPanel, BorderLayout.CENTER);
+
         int choice = JOptionPane.showOptionDialog(
                 frame,
-                players[playerIndex] + " rolled: The " + pokemonName + " line" +
-                        "\n\nThis line has the Pokémon:\n" +
-                        wholeEvoLine +
-                        "\nSave this Pokémon or discard it?",
+                panel,
                 "Confirm Roll",
-                JOptionPane.YES_NO_CANCEL_OPTION,
+                JOptionPane.YES_NO_OPTION,
                 JOptionPane.PLAIN_MESSAGE,
                 null,
                 options,
