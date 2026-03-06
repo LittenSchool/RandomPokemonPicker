@@ -437,15 +437,24 @@ public class RandomNumberGUI {
     }
 
     private static void onListElementClicked(int playerIndex, String value) {
-        JTextArea label = new JTextArea(value + " evo line includes: \n" + getEvoLineFromSpecies(value));
-        label.setEditable(false);
-        label.setFont(new Font("Arial", Font.BOLD, TheCollection.getFontSize() /2));
-        JOptionPane.showMessageDialog(frame,
-                label,
-                "Item Clicked",
-                JOptionPane.INFORMATION_MESSAGE
+        ImageIcon icon = loadPokemonIcon(value, TheCollection.getFontSize()*3);
+        Object[] option = {"Okay"};
+        JOptionPane.showOptionDialog(
+                frame,
+                players[playerIndex] + " selected the " + value + " line" +
+                        "\nThis line has the Pokémon:\n" +
+                        getEvoLineFromSpecies(value),
+                "Confirm Roll",
+                JOptionPane.YES_NO_CANCEL_OPTION,
+                JOptionPane.PLAIN_MESSAGE,
+                icon,
+                option,
+                option[0]
+
         );
     }
+
+
 
     private static String getEvoLineFromSpecies(String pokemonName) {
         StringBuilder wholeEvoLine = new StringBuilder();
