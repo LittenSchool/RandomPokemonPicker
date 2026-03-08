@@ -67,7 +67,6 @@ public class TheCollection {
 
     public static int getFontSize() {
 
-            System.out.println(scaleFont(fontSize));
             return (scaleFont(fontSize));
         //return fontSize;
     }

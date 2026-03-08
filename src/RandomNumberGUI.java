@@ -208,10 +208,12 @@ public class RandomNumberGUI {
 
         numberLabel.setText(players[playerIndex] + " rolled: The " + pokemonName + " line");
 
+
+
+
         Object[] options = {
                 "Save Pokémon",
                 "Discard (Remaining: " + discardsPerPlayer[playerIndex] + ")",
-                "Cancel"
         };
 
         Object[] discardOptions = {
@@ -234,6 +236,7 @@ public class RandomNumberGUI {
                 options,
                 options[0]
         );
+
 
         if (choice == 0) {
             Pokemon temp = new Pokemon(pokemonName);
@@ -275,7 +278,11 @@ public class RandomNumberGUI {
                         JOptionPane.ERROR_MESSAGE
                 );
 
+                Pokemon temp = new Pokemon(pokemonName);
+                temp.setColour(TheCollection.getPlayerColours().get(playerIndex));
+                TheCollection.pokemonInPlay.add(temp);
                 listModels[playerIndex].addElement(pokemonName);
+                TheCollection.species.remove(pokemonName);
             }
         }
 
@@ -327,7 +334,6 @@ public class RandomNumberGUI {
             if (timerVelocity[0] <= 0) {
                 timerVelocity[0] = 1;
             }
-            System.out.println(timerVelocity[0]);
 
 
             ticks[0]++;
