@@ -45,7 +45,6 @@ public class StartupPeoplePicker {
                 color = colorChooser.getColor();
             }
             TheCollection.addPlayer(enterBox.getText());
-            System.out.println(TheCollection.colourToHex(color));
             TheCollection.addColour(TheCollection.colourToHex(color));
             enterBox.setText("");
         });

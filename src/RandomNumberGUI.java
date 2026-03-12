@@ -339,7 +339,6 @@ public class RandomNumberGUI {
             ticks[0]++;
 
             if (hasEnded[0]) { // Makes the last rolled pokemon pop up last
-                System.out.println("balls");
                 timer.stop();
                 rollDialog.dispose();
 
